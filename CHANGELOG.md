@@ -1,3 +1,7 @@
+**Unreleased**
+
+* Add support for capitalizing/titleizing displayed string
+
 **2.1.0** (September 4, 2018)
 
 * Add support for non-padded numerical strftime values (`%-d`, `%-m`, etc.) [Paco Benavent]

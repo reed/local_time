@@ -1,7 +1,7 @@
 #= require ./relative_time
 #= require ./page_observer
 
-{parseDate, strftime, getI18nValue, config} = LocalTime
+{parseDate, strftime, getI18nValue, config, transform} = LocalTime
 
 class LocalTime.Controller
   SELECTOR = "time[data-local]:not([data-localized])"
@@ -28,6 +28,7 @@ class LocalTime.Controller
     datetime = element.getAttribute("datetime")
     format = element.getAttribute("data-format")
     local = element.getAttribute("data-local")
+    transformType = element.getAttribute("data-transform")
 
     time = parseDate(datetime)
     return if isNaN time
@@ -36,7 +37,7 @@ class LocalTime.Controller
       title = strftime(time, getI18nValue("datetime.formats.default"))
       element.setAttribute("title", title)
 
-    element.textContent = content =
+    content =
       switch local
         when "time"
           markAsLocalized(element)
@@ -51,7 +52,11 @@ class LocalTime.Controller
         when "weekday"
           relative(time).toWeekdayString()
         when "weekday-or-date"
-          relative(time).toWeekdayString() or relative(time).toDateString()
+          relative(time).toWeekdayString() or relative(time, transform: transform).toDateString()
+
+    content = transform content, transformType
+
+    element.textContent = content
 
     unless element.hasAttribute("aria-label")
       element.setAttribute("aria-label", content)
@@ -59,5 +64,5 @@ class LocalTime.Controller
   markAsLocalized = (element) ->
     element.setAttribute("data-localized", "")
 
-  relative = (time) ->
-    new LocalTime.RelativeTime time
+  relative = (time, options = {}) ->
+    new LocalTime.RelativeTime time, options

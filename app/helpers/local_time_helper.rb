@@ -4,9 +4,10 @@ module LocalTimeHelper
 
     options, format = extract_options_and_value(options, :format)
     format = find_time_format(format)
+    options, transform = extract_options_and_value(options, :transform)
 
     options[:data] ||= {}
-    options[:data].merge! local: :time, format: format
+    options[:data].merge! local: :time, format: format, transform: transform
 
     time_tag time, time.strftime(format), options
   end
@@ -14,15 +15,17 @@ module LocalTimeHelper
   def local_date(time, options = nil)
     options, format = extract_options_and_value(options, :format)
     options[:format] = format || LocalTime.default_date_format
+
     local_time time, options
   end
 
   def local_relative_time(time, options = nil)
     time = utc_time(time)
     options, type = extract_options_and_value(options, :type)
+    options, transform = extract_options_and_value(options, :transform)
 
     options[:data] ||= {}
-    options[:data].merge! local: type
+    options[:data].merge! local: type, transform: transform
 
     time_tag time, time.strftime(LocalTime.default_time_format), options
   end
@@ -30,6 +33,7 @@ module LocalTimeHelper
   def local_time_ago(time, options = nil)
     options, * = extract_options_and_value(options, :type)
     options[:type] = 'time-ago'
+
     local_relative_time time, options
   end
 
